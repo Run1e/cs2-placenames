@@ -44,6 +44,11 @@ public class Program
             return;
         }
 
+        if (!output.Exists) {
+            Console.WriteLine("Output folder does not exist.");
+            return;
+        }
+
         FileInfo[] files;
         Regex filter = new Regex(regexPattern);
 
