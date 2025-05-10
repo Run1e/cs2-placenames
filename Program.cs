@@ -44,7 +44,8 @@ public class Program
             return;
         }
 
-        if (!output.Exists) {
+        if (!output.Exists)
+        {
             Console.WriteLine("Output folder does not exist.");
             return;
         }
@@ -80,7 +81,7 @@ public class Program
 
             if (mp == null || mp.Count == 0)
             {
-                Console.WriteLine("Skipping " + name);
+                Console.WriteLine("Skipping " + name + ", no vpk or no ents");
                 continue;
             }
 
@@ -142,13 +143,13 @@ public class Program
 
         foreach (EntityLump.Entity item in el.GetEntities())
         {
-            string classname = (string)item.GetProperty("classname").Data;
+            string classname = (string)item.GetProperty("classname").Value;
 
             if (classname != "env_cs_place")
                 continue;
 
-            string place_name = (string)item.GetProperty("place_name").Data;
-            string origin = (string)item.GetProperty("origin").Data;
+            string place_name = (string)item.GetProperty("place_name").Value;
+            string origin = (string)item.GetProperty("origin").Value;
 
             string[] components = origin.Split(" ");
 
