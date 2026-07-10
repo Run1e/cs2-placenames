@@ -1,10 +1,11 @@
-﻿using SteamDatabase.ValvePak;
-using ValveResourceFormat;
-using ValveResourceFormat.ResourceTypes;
+﻿using System;
 using System.CommandLine;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
-
+using SteamDatabase.ValvePak;
+using ValveResourceFormat;
+using ValveResourceFormat.ResourceTypes;
+using ValveResourceFormat.Serialization.KeyValues;
 using MapPlaces = System.Collections.Generic.Dictionary<string, System.Collections.Generic.List<System.Collections.Generic.List<float>>>;
 
 
@@ -129,7 +130,6 @@ public class Program
 
     static MapPlaces? HandleVents(Package package, PackageEntry entry)
     {
-
         MapPlaces mp = new MapPlaces();
         List<float> vec;
 
@@ -149,20 +149,30 @@ public class Program
                 continue;
 
             string place_name = (string)item.GetProperty("place_name").Value;
-            string origin = (string)item.GetProperty("origin").Value;
+            KVValue origin = item.GetProperty("origin");
 
-            string[] components = origin.Split(" ");
+            float x, y, z;
 
-            if (float.TryParse(components[0], out float x) &&
-                float.TryParse(components[1], out float y) &&
-                float.TryParse(components[2], out float z))
+            if (origin.Value is string originStr)
             {
-                vec = new List<float> { x, y, z };
+                string[] components = originStr.Split(' ');
+                x = float.Parse(components[0]);
+                y = float.Parse(components[1]);
+                z = float.Parse(components[2]);
+            }
+            else if (origin.Value is KVObject kv)
+            {
+                x = kv.GetFloatProperty("0");
+                y = kv.GetFloatProperty("1");
+                z = kv.GetFloatProperty("2");
             }
             else
             {
-                throw new Exception("Failed to parse vector components: " + origin);
+                Console.WriteLine($"Unknown type: {origin.Value.GetType().FullName}");
+                continue;
             }
+
+            vec = new List<float> { x, y, z };
 
             if (mp.ContainsKey(place_name))
                 mp[place_name].Add(vec);
